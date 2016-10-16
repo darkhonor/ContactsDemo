@@ -1,0 +1,5 @@
+# Set the language
+language: objective-c
+
+# Build with Xcode 8 to ensure Swift 3 is used
+osx_image: xcode8
