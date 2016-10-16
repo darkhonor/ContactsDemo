@@ -5,3 +5,20 @@ language: objective-c
 osx_image: xcode8
 
 xcode_scheme: ContactsDemo
+
+env:
+    global:
+        - LANG=en_US.UTF-8
+
+        - PROJECT="ContactsDemo.xcodeproj"
+        - IOS_SCHEME="ContactsDemo"
+
+        - IOS_SDK=iphonesimulator10.0
+
+    matrix:
+        - DESTINATION="OS=9.0,name=iPhone 6 Plus"  SDK="$IOS_SDK" SCHEME="$IOS_SCHEME"
+        - DESTINATION="OS=9.1,name=iPhone 6s"      SDK="$IOS_SDK" SCHEME="$IOS_SCHEME"
+        - DESTINATION="OS=9.2,name=iPhone 6s Plus" SDK="$IOS_SDK" SCHEME="$IOS_SCHEME"
+
+        - DESTINATION="OS=10.0,name=iPhone 7" SDK="$IOS_SDK" SCHEME="$IOS_SCHEME"
+
