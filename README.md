@@ -1,5 +1,5 @@
 # ContactsDemo
-[![Build Status](https://travis-ci.org/darkhonor/ContactsDemo.svg?branch=master)](https://travis-ci.org/darkhonor/ContactsDemo)
+[![Build Status](https://travis-ci.org/darkhonor/ContactsDemo.svg?branch=master)](https://travis-ci.org/darkhonor/ContactsDemo) 
 
 Demo for using the Contacts and ContactsUI framework in Swift 3.0
 
