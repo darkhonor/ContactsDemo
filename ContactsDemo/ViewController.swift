@@ -9,10 +9,10 @@
 import UIKit
 import ContactsUI
 
-class ViewController: UIViewController, CNContactPickerDelegate {
+class ViewController: UIViewController, CNContactPickerDelegate, CNContactViewControllerDelegate {
 
     static let ContactCell = "ContactCell"
-    static let GroupName = "Some Group"
+    static let GroupNameDefault = "Some Group"
 
     var contacts: [CNContact] = [CNContact]()
 
@@ -71,14 +71,14 @@ class ViewController: UIViewController, CNContactPickerDelegate {
         let store: CNContactStore = CNContactStore()
         do {
             let allGroups = try store.groups(matching: nil)
-            let filteredGroups = allGroups.filter { $0.name == ViewController.GroupName }
+            let filteredGroups = allGroups.filter { $0.name == self.getGroupName() }
             print("Groups filtered")
 
             if filteredGroups.count == 1 {
-                print("\(ViewController.GroupName) group exists")
+                print("\(self.getGroupName()) group exists")
             } else {
                 let vtGroup = CNMutableGroup()
-                vtGroup.name = ViewController.GroupName
+                vtGroup.name = self.getGroupName()
                 let request = CNSaveRequest()
                 request.add(vtGroup, toContainerWithIdentifier: nil)
                 do {
@@ -96,7 +96,7 @@ class ViewController: UIViewController, CNContactPickerDelegate {
     private func loadContactsFromStore() -> [CNContact] {
         let store: CNContactStore = CNContactStore()
         guard let vtGroup = self.getContactGroup() else {
-            NSLog("ERROR: Unable to load \(ViewController.GroupName) Group")
+            NSLog("ERROR: Unable to load \(self.getGroupName()) Group")
             return []
         }
         let predicate = CNContact.predicateForContactsInGroup(withIdentifier: vtGroup.identifier)
@@ -114,16 +114,26 @@ class ViewController: UIViewController, CNContactPickerDelegate {
         let store: CNContactStore = CNContactStore()
         do {
             let allGroups = try store.groups(matching: nil)
-            let filteredGroups = allGroups.filter { $0.name == ViewController.GroupName }
+            let filteredGroups = allGroups.filter { $0.name == self.getGroupName() }
 
             guard let vtGroup = filteredGroups.first else {
-                NSLog("No \(ViewController.GroupName) group")
+                NSLog("No \(self.getGroupName()) group")
                 return nil
             }
             return vtGroup
         } catch let err {
             NSLog("Error caught grabbing Group: \(err)")
             return nil
+        }
+    }
+
+    private func getGroupName() -> String {
+        let defaults = UserDefaults.standard
+        let cnGroupName = defaults.string(forKey: "CNGroupName")
+        if cnGroupName != nil && cnGroupName!.isEmpty {
+            return cnGroupName!
+        } else {
+            return ViewController.GroupNameDefault
         }
     }
 
@@ -134,9 +144,28 @@ class ViewController: UIViewController, CNContactPickerDelegate {
     }
 
     @IBAction func addNew(_ sender: AnyObject) {
-        
+        let cnViewController = CNContactViewController(forNewContact: nil)
+        cnViewController.contactStore = CNContactStore()
+        cnViewController.delegate = self
+        self.navigationController?.pushViewController(cnViewController, animated: true)
     }
-    
+
+    func contactViewController(_ viewController: CNContactViewController, didCompleteWith contact: CNContact?) {
+        if contact != nil {
+            updateGroup(contact: contact!)
+            NotificationCenter.default.post(name: NSNotification.Name(rawValue: "addNewContact"), object: nil, userInfo: ["contactToAdd": contact!])
+            DispatchQueue.main.async (execute: { () -> Void in
+                self.tableView.reloadData()
+            })
+        } else {
+            _ = self.navigationController?.popViewController(animated: true)
+        }
+    }
+
+    func contactViewController(_ viewController: CNContactViewController, shouldPerformDefaultActionFor property: CNContactProperty) -> Bool {
+        return true
+    }
+
     func contactPicker(_ picker: CNContactPickerViewController, didSelect contact: CNContact) {
         updateGroup(contact: contact)
         NotificationCenter.default.post(name: NSNotification.Name(rawValue: "addNewContact"), object: nil, userInfo: ["contactToAdd": contact])
@@ -149,7 +178,7 @@ class ViewController: UIViewController, CNContactPickerDelegate {
         let store: CNContactStore = CNContactStore()
         let request = CNSaveRequest()
         guard let group = getContactGroup() else {
-            NSLog("Error: Unable to get \(ViewController.GroupName) Group")
+            NSLog("Error: Unable to get \(self.getGroupName()) Group")
             return
         }
         request.addMember(contact, to: group)

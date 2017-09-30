@@ -1,8 +1,9 @@
 # Set the language
 language: objective-c
 
-# Build with Xcode 8.2 to ensure Swift 3 is used
-osx_image: xcode8.2
+# Build with Xcode 9
+osx_image: xcode9
+
 # xcode_project: ContactsDemo.xcodeproj
 xcode_scheme: ContactsDemo
 # xcode_sdk: iphonesimulator10.0
@@ -14,7 +15,7 @@ env:
         - PROJECT="ContactsDemo.xcodeproj"
         - IOS_SCHEME="ContactsDemo"
 
-        - IOS_SDK=iphonesimulator10.0
+        - IOS_SDK=iphonesimulator11.0
 
     matrix:
         - DESTINATION="OS=9.0,name=iPhone 6 Plus"  SDK="$IOS_SDK" SCHEME="$IOS_SCHEME" RUN_TESTS="NO"
@@ -25,6 +26,8 @@ env:
         - DESTINATION="OS=10.2,name=iPhone 7" SDK="$IOS_SDK" SCHEME="$IOS_SCHEME" RUN_TESTS="NO"
         - DESTINATION="OS=10.2,name=iPhone 7 Plus" SDK="$IOS_SDK" SCHEME="$IOS_SCHEME" RUN_TESTS="NO"
         - DESTINATION="OS=10.2,name=iPhone SE" SDK="$IOS_SDK" SCHEME="$IOS_SCHEME" RUN_TESTS="NO"
+        - DESTINATION="OS=10.3,name=iPhone 7" SDK="$IOS_SDK" SCHEME="$IOS_SCHEME" RUN_TESTS="NO"
+        - DESTINATION="OS=11.0,name=iPhone 8" SDK="$IOS_SDK" SCHEME="$IOS_SCHEME" RUN_TESTS="NO"
 
 script:
 - if [ $RUN_TESTS == "YES" ]; then
